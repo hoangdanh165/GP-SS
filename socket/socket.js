@@ -6,6 +6,7 @@ import pool from "../db/connectDB.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
+  // ["http://localhost:3000", "https://prestige-auto.netlify.app"]
   cors: {
     origin: "*",
     allowedHeaders: ["Authorization", "Content-Type"],
@@ -28,15 +29,13 @@ io.on("connection", (socket) => {
 
   socket.on("markMessagesAsSeen", async ({ conversationId, userId }) => {
     try {
-      // Cập nhật trạng thái "seen" cho tất cả tin nhắn chưa đọc trong cuộc trò chuyện
       await pool.query(
         `UPDATE message 
-      SET status = 'seen' 
-      WHERE conversation_id = $1 AND status != 'seen'`,
+      SET seen = TRUE
+      WHERE conversation_id = $1 AND seen = FALSE`,
         [conversationId]
       );
 
-      // Cập nhật trạng thái "seen" của lastMessage trong conversation
       await pool.query(
         `UPDATE conversation 
       SET last_message_seen = TRUE
@@ -44,7 +43,6 @@ io.on("connection", (socket) => {
         [conversationId]
       );
 
-      // Gửi sự kiện về client
       io.to(userSocketMap[userId]).emit("messagesSeen", { conversationId });
     } catch (error) {
       console.error("Error marking messages as seen:", error);
