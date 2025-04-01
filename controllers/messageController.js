@@ -1,5 +1,4 @@
 import { getRecipientSocketId, io } from "../socket/socket.js";
-import { v2 as cloudinary } from "cloudinary";
 import pool from "../db/connectDB.js";
 
 async function sendMessage(req, res) {
@@ -24,7 +23,7 @@ async function sendMessage(req, res) {
     let conversationId = conversation.rows[0]?.id;
 
     if (!conversationId) {
-      console.log("🚀 Không tìm thấy cuộc trò chuyện, tạo mới...");
+      console.log("No previous conversation found, creating...");
       const newConversation = await pool.query(
         `INSERT INTO conversation DEFAULT VALUES RETURNING id`
       );
@@ -54,14 +53,14 @@ async function sendMessage(req, res) {
 
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("newMessage", newMessage.rows[0]);
-      console.log("📬 Tin nhắn đã gửi qua WebSocket!");
+      console.log("Message's sent through WebSocket!");
     } else {
-      console.log("⚠️ Người nhận không online!");
+      console.log("Receiver not online!");
     }
 
     res.status(201).json(newMessage.rows[0]);
   } catch (error) {
-    console.error("❌ Lỗi trong sendMessage:", error.message);
+    console.error("Error(s) in sendMessage:", error.message);
     res.status(500).json({ error: error.message });
   }
 }

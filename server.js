@@ -3,12 +3,13 @@ import { connectDB } from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import { app, server } from "./socket/socket.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import conversationRoutes from "./routes/conversationRoutes.js";
 import express from "express";
 import cors from "cors";
 
 app.use(
   cors({
-    origin: "*", // Cho phép tất cả origin gọi API
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -22,6 +23,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/v1/messages", messageRoutes);
+app.use("/api/v1/conversations", conversationRoutes);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () =>
