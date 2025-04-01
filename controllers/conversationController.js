@@ -55,7 +55,7 @@ async function createConversation(req, res) {
 
     res.status(201).json(conversationData);
   } catch (error) {
-    console.error("Error(s) in createConversation:", error.message);
+    console.error("Error(s) when creating conversation:", error.message);
     res.status(500).json({ error: error.message });
   }
 }
