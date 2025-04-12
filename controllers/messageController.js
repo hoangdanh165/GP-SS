@@ -28,7 +28,7 @@ async function sendMessage(req, res) {
         `INSERT INTO conversation DEFAULT VALUES RETURNING id`
       );
       conversationId = newConversation.rows[0].id;
-      console.log("🆕 Conversation ID mới:", conversationId);
+      console.log("Conversation ID mới:", conversationId);
 
       await pool.query(
         `INSERT INTO conversation_participants (conversation_id, user_id) VALUES ($1, $2), ($1, $3)`,
