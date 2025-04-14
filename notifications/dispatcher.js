@@ -1,29 +1,30 @@
-import webTemplates from "./templates/web";
-import emailTemplates from "./templates/email";
-import smsTemplates from "./templates/sms";
+import webTemplates from "./templates/web.js";
 
-import { sendWebNotification } from "./channels/web";
-import { sendEmailNotification } from "./channels/email";
-import { sendSMSNotification } from "./channels/sms";
+import { sendWebNotification } from "./channels/web.js";
+import { sendEmailNotification } from "./channels/email.js";
 
-export const dispatchNotification = async ({ type, user, params = {} }) => {
-  if (!type || !user) return;
+export const dispatchNotification = async ({
+  type,
+  reminderType = null,
+  id = null,
+  user = null,
+  params = {},
+}) => {
+  if (!type && !reminderType) return;
 
-  // Web
-  if (webTemplates[type]) {
-    const msg = webTemplates[type](params);
-    sendWebNotification(user.id, msg);
+  if (type === "EMAIL") {
+    console.log("Sending email notification...");
+    if (!id || !reminderType) return;
+    const msg = await sendEmailNotification({ id, reminderType, type });
+    return msg;
   }
 
-  // Email
-  if (emailTemplates[type]) {
-    const email = emailTemplates[type]({ ...params, name: user.name });
-    await sendEmailNotification(user, email);
-  }
-
-  // SMS
-  if (smsTemplates[type]) {
-    const sms = smsTemplates[type](params);
-    await sendSMSNotification(user, sms);
+  if (type === "WEB") {
+    if (!user) return;
+    console.log("Sending web notification...");
+    if (webTemplates[reminderType]) {
+      const msg = webTemplates[type](params);
+      sendWebNotification(user.id, msg);
+    }
   }
 };

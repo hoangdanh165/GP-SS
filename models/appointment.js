@@ -47,6 +47,14 @@ const Appointment = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
+    reminded_before_1h: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    reminded_before_1d: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     create_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
