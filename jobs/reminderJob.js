@@ -27,36 +27,39 @@ const startReminderJob = () => {
         `[CRON] Processing appointment ID: ${id}, diff: ${diffInMinutes} minutes`
       );
 
-      if (diffInMinutes >= 58 && diffInMinutes <= 60 && !reminded_before_1h) {
-        // await dispatchNotification({
-        //   type: "WEB",
-        //   reminderType: "APPOINTMENT_REMINDER_1H",
-        //   user: customer,
-        //   params: { time: apptTime.format("HH:mm DD/MM/YYYY") },
-        // });
+      if (diffInMinutes >= 58 && diffInMinutes <= 62 && !reminded_before_1h) {
         await dispatchNotification({
           type: "EMAIL",
-          reminderType: "APPOINTMENT_REMINDER_1H",
+          reminderType: "APPOINTMENT_REMINDER_B1H",
           id: id,
         });
+
+        await dispatchNotification({
+          type: "WEB",
+          reminderType: "APPOINTMENT_REMINDER_B1H",
+          user: customer,
+          params: { time: apptTime },
+        });
+
         console.log("sent reminder 1h email");
       }
 
       if (
         diffInMinutes >= 1438 &&
-        diffInMinutes <= 1440 &&
+        diffInMinutes <= 1442 &&
         !reminded_before_1d
       ) {
         await dispatchNotification({
           type: "EMAIL",
-          reminderType: "APPOINTMENT_REMINDER_1D",
+          reminderType: "APPOINTMENT_REMINDER_B1D",
           user: customer,
           params: { time: apptTime.format("HH:mm DD/MM/YYYY") },
         });
         await dispatchNotification({
-          type: "EMAIL",
-          id: id,
-          reminderType: "APPOINTMENT_REMINDER_1D",
+          type: "WEB",
+          reminderType: "APPOINTMENT_REMINDER_B1D",
+          user: customer,
+          params: { time: apptTime.format("HH:mm DD/MM/YYYY") },
         });
       }
     }

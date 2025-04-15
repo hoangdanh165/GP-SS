@@ -18,7 +18,5 @@ export const getUpcomingAppointments = async () => {
     include: [{ model: User, as: "customer" }],
   });
 
-  console.log(appointments);
-
   return appointments;
 };

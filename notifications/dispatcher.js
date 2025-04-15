@@ -1,5 +1,3 @@
-import webTemplates from "./templates/web.js";
-
 import { sendWebNotification } from "./channels/web.js";
 import { sendEmailNotification } from "./channels/email.js";
 
@@ -22,9 +20,6 @@ export const dispatchNotification = async ({
   if (type === "WEB") {
     if (!user) return;
     console.log("Sending web notification...");
-    if (webTemplates[reminderType]) {
-      const msg = webTemplates[type](params);
-      sendWebNotification(user.id, msg);
-    }
+    sendWebNotification(user.id, null, reminderType, params);
   }
 };
