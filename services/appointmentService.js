@@ -1,5 +1,5 @@
-import Appointment from "../models/Appointment.js";
-import User from "../models/User.js";
+import Appointment from "../models/appointment.js";
+import User from "../models/user.js";
 import { Op } from "sequelize";
 import dayjs from "dayjs";
 
