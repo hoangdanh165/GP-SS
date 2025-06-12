@@ -3,7 +3,7 @@ import pool from "../db/connectDB.js";
 
 async function sendMessage(req, res) {
   try {
-    const { receiver, message, sender } = req.body;
+    const { receiver, message, sender, image_path, image_url } = req.body;
 
     let conversation = await pool.query(
       `SELECT id FROM conversation
@@ -37,12 +37,18 @@ async function sendMessage(req, res) {
     }
 
     const newMessage = await pool.query(
-      `INSERT INTO message (id, conversation_id, sender_id, receiver_id, message, message_type, seen, created_at, updated_at, parent_message_id)
-      VALUES (gen_random_uuid(), $1, $2, $3, $4, 'text', FALSE, NOW(), NOW(), NULL) 
+      `INSERT INTO message (id, conversation_id, sender_id, receiver_id, message, image,message_type, seen, created_at, updated_at, parent_message_id)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, 'text', FALSE, NOW(), NOW(), NULL) 
       RETURNING id, conversation_id AS conversation, sender_id AS sender, receiver_id AS receiver, 
-                message, message_type, seen, created_at, updated_at, parent_message_id`,
-      [conversationId, sender, receiver, message || null]
+                message, message_type, seen, created_at, updated_at, parent_message_id, image`,
+      [conversationId, sender, receiver, message || null, image_path || null]
     );
+
+    const messageData = newMessage.rows[0];
+
+    if (messageData.image) {
+      messageData.image = image_url;
+    }
 
     await pool.query(
       `UPDATE conversation SET last_message = $1, last_sender_id = $2, updated_at = NOW() WHERE id = $3`,
@@ -52,13 +58,13 @@ async function sendMessage(req, res) {
     const recipientSocketId = getRecipientSocketId(receiver);
 
     if (recipientSocketId) {
-      io.to(recipientSocketId).emit("newMessage", newMessage.rows[0]);
+      io.to(recipientSocketId).emit("newMessage", messageData);
       console.log("Message's sent through WebSocket!");
     } else {
       console.log("Receiver not online!");
     }
 
-    res.status(201).json(newMessage.rows[0]);
+    res.status(201).json(messageData);
   } catch (error) {
     console.error("Error(s) in sendMessage:", error.message);
     res.status(500).json({ error: error.message });
