@@ -52,7 +52,7 @@ async function sendMessage(req, res) {
 
     await pool.query(
       `UPDATE conversation SET last_message = $1, last_sender_id = $2, updated_at = NOW() WHERE id = $3`,
-      [message, sender, conversationId]
+      [image_path ? "[Image]" : message, sender, conversationId]
     );
 
     const recipientSocketId = getRecipientSocketId(receiver);
